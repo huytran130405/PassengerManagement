@@ -1,94 +1,63 @@
-import java.io.*;
 import java.util.*;
 
-
 public class UpdatePassenger {
-    public void runUpdateProcess(String filePath) {
 
-        while (true) {
-            displayPassengers(filePath);
+    private PassengerManagement passengerManagement;
 
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Nhap ID cua hanh khach can cap nhat: ");
-            String keyword = scanner.nextLine().toLowerCase();
-
-            try {
-                updatePassenger(filePath, keyword);
-            } catch (IOException e) {
-                System.out.println("Da xay ra loi: " + e.getMessage());
-            }
-
-            System.out.println("\nBan co muon tiep tuc tim kiem? (Nhap 'Y' de tiep tuc, bat ky phim nao khac de thoat): ");
-            String choice = scanner.nextLine().trim().toLowerCase();
-            if (!choice.equals("y")) {
-                System.out.println("Thoat tim kiem. Tam biet!");
-                break;
-            }
-        }
+    public UpdatePassenger(PassengerManagement passengerManagement) {
+        this.passengerManagement = passengerManagement;
     }
 
-    public void displayPassengers(String filePath) {
-        System.out.println("Danh sach khach hang hien tai:");
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+    public void execute() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter ID to update: ");
+        String id = scanner.nextLine().trim(); // Loại bỏ khoảng trắng thừa
+
+        // Tìm hành khách cần cập nhật
+        Passenger passengerToUpdate = passengerManagement.findPassenger(id);
+        if (passengerToUpdate != null) {
+            System.out.println("Passenger found: ");
+            System.out.println("Current Information:");
+            System.out.println("Name: " + passengerToUpdate.getName());
+            System.out.println("Age: " + passengerToUpdate.getAge());
+            System.out.println("Gender: " + passengerToUpdate.getGender());
+            System.out.println("Phone: " + passengerToUpdate.getPhoneNumber());
+
+            // Nhập thông tin mới
+            System.out.print("Enter new Name (leave blank to keep current): ");
+            String newName = scanner.nextLine().trim();
+            System.out.print("Enter new Age (leave blank to keep current): ");
+            String newAgeInput = scanner.nextLine().trim();
+            System.out.print("Enter new Gender (leave blank to keep current): ");
+            String newGender = scanner.nextLine().trim();
+            System.out.print("Enter new Phone Number (leave blank to keep current): ");
+            String newPhoneNumber = scanner.nextLine().trim();
+
+            // Cập nhật thông tin nếu cần
+            if (!newName.isEmpty()) {
+                passengerToUpdate.setName(newName);
             }
-        } catch (IOException e) {
-            System.out.println("Da xay ra loi khi doc tep: " + e.getMessage());
-        }
-    }
-
-    public void updatePassenger(String filePath, String idToUpdate) throws IOException {
-        File inputFile = new File(filePath);
-        File tempFile = new File("temp.csv");
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
-
-            Scanner scanner = new Scanner(System.in);
-            String line;
-            boolean updated = false;
-
-            while ((line = reader.readLine()) != null) {
-                String[] details = line.split(",");
-
-                if (details[0].equals(idToUpdate)) {
-                    System.out.println("Thong tin hien tai: " + line);
-                    System.out.println("Nhap ten moi (hoac de trong de giu nguyen): ");
-                    String name = scanner.nextLine();
-                    System.out.println("Nhap tuoi moi (hoac de trong de giu nguyen): ");
-                    String age = scanner.nextLine();
-                    System.out.println("Nhap gioi tinh moi (hoac de trong de giu nguyen): ");
-                    String gender = scanner.nextLine();
-                    System.out.println("Nhap so dien thoai moi (hoac de trong de giu nguyen): ");
-                    String phoneNumber = scanner.nextLine();
-
-                    if (!name.isEmpty()) details[1] = name;
-                    if (!age.isEmpty()) details[2] = age;
-                    if (!gender.isEmpty()) details[3] = gender;
-                    if (!phoneNumber.isEmpty()) details[4] = phoneNumber;
-
-                    writer.write(String.join(",", details) + System.lineSeparator());
-                    updated = true;
-                } else {
-                    writer.write(line + System.lineSeparator());
+            if (!newAgeInput.isEmpty()) {
+                try {
+                    int newAge = Integer.parseInt(newAgeInput);
+                    passengerToUpdate.setAge(newAge);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid age input. Keeping current age.");
                 }
             }
-
-            if (!updated) {
-                System.out.println("Khong tim thay hanh khach voi ID: " + idToUpdate);
-            } else {
-                System.out.println("Cap nhat thong tin hanh khach thanh cong.");
+            if (!newGender.isEmpty()) {
+                passengerToUpdate.setGender(newGender);
             }
-        }
-
-        if (inputFile.delete()) {
-            if (!tempFile.renameTo(inputFile)) {
-                System.out.println("Khong the doi ten tep tam.");
+            if (!newPhoneNumber.isEmpty()) {
+                passengerToUpdate.setPhoneNumber(newPhoneNumber);
             }
+
+            // Lưu thay đổi vào danh sách
+            passengerManagement.updatePassenger(passengerToUpdate);
+            System.out.println("Passenger updated successfully.");
         } else {
-            System.out.println("Khong the cap nhat tep.");
+            System.out.println("Passenger not found.");
         }
     }
 }
+
