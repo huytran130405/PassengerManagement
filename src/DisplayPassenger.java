@@ -1,26 +1,30 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.List;
 
 public class DisplayPassenger {
-    private String filePath;
+    private PassengerManagement passengerManagement;
 
-    public DisplayPassenger(String filePath) {
-        this.filePath = filePath;
+    // Constructor nhận đối tượng PassengerManagement
+    public DisplayPassenger(PassengerManagement passengerManagement) {
+        this.passengerManagement = passengerManagement;
     }
 
-    public void readData() {
-        System.out.println("Danh sach khach hang hien tai:");
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            System.out.println("Da xay ra loi khi doc tep: " + e.getMessage());
+    public void execute() {
+        // Lấy danh sách hành khách từ PassengerManagement
+        List<Passenger> passengers = passengerManagement.getPassengers();
+
+        if (passengers.isEmpty()) {
+            System.out.println("No passengers found.");
+            return;
+    }
+
+        // Hiển thị danh sách hành khách
+        System.out.println("Passenger List:");
+        for (Passenger passenger : passengers) {
+            System.out.println("ID: " + passenger.getId() + ", Name: " + passenger.getName() +
+                    ", Age: " + passenger.getAge() + ", Gender: " + passenger.getGender() +
+                    ", Phone: " + passenger.getPhoneNumber());
         }
     }
 }
-
-
 
