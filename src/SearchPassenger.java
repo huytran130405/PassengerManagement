@@ -1,57 +1,28 @@
-import java.io.*;
-import java.util.*;
+import java.util.Scanner;
 
 public class SearchPassenger {
+    private PassengerManagement passengerManagement;
 
-    private final String filePath;
-
-    public SearchPassenger(String filePath) {
-        this.filePath = filePath;
+    public SearchPassenger(PassengerManagement passengerManagement) {
+        this.passengerManagement = passengerManagement;
     }
 
-    public void runSearch() {
+    public void execute() {
         Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter ID to find: ");
+        String id = scanner.nextLine();
 
-            while (true) {
-            System.out.println("\nNhap  ID hanh khach can tim: ");
-            String keyword = scanner.nextLine().toLowerCase();
+        Passenger passenger = passengerManagement.findPassenger(id);
 
-            try {
-                List<String> results = this.searchPassenger(keyword);
-                if (results.isEmpty()) {
-                    System.out.println("Khong tim thay hanh khach phu hop.");
-                } else {
-                    System.out.println("\nDanh sach hanh khach tim thay:");
-                    for (String result : results) {
-                        System.out.println(result);
-                    }
-                }
-            } catch (IOException e) {
-                System.err.println("Da xay ra loi khi doc file: " + e.getMessage());
-            }
-
-            System.out.println("\nBan co muon tiep tuc tim kiem? (Nhap 'Y' de tiep tuc, bat ky phim nao khac de thoat): ");
-            String choice = scanner.nextLine().trim().toLowerCase();
-            if (!choice.equals("y")) {
-                System.out.println("Thoat tim kiem. Tam biet!");
-                break;
-            }
+        if (passenger != null) {
+            System.out.println("Passenger found: ");
+            System.out.println("ID: " + passenger.getId());
+            System.out.println("Name: " + passenger.getName());
+            System.out.println("Age: " + passenger.getAge());
+            System.out.println("Gender: " + passenger.getGender());
+            System.out.println("Phone: " + passenger.getPhoneNumber());
+        } else {
+            System.out.println("Passenger not found.");
         }
-    }
-
-    private List<String> searchPassenger(String keyword) throws IOException {
-        List<String> matchingPassengers = new ArrayList<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] columns = line.split(",");
-                if (columns.length > 0 && columns[0].equalsIgnoreCase(keyword)) { // Check if ID matches
-                    matchingPassengers.add(line);
-                }
-            }
-        }
-
-        return matchingPassengers;
     }
 }
